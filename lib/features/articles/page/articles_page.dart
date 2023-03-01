@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:user_articles/app/core/enums.dart';
-import 'package:user_articles/data/remote_data_sources/articles_remote_data_source.dart';
+import 'package:user_articles/app/injection_container.dart';
 import 'package:user_articles/domain/models/article_model.dart';
 import 'package:user_articles/domain/models/author_model.dart';
-import 'package:user_articles/domain/repositories/articles_repository.dart';
 import 'package:user_articles/features/articles/cubit/articles_cubit.dart';
+import 'package:user_articles/features/details/details_page.dart';
 
 class ArticlesPage extends StatelessWidget {
   const ArticlesPage({
@@ -22,13 +22,12 @@ class ArticlesPage extends StatelessWidget {
         title: Text(author.name),
       ),
       body: BlocProvider<ArticlesCubit>(
-        create: (context) => ArticlesCubit(
-          articlesRepository: ArticlesRepository(
-            remoteDataSource: ArticlesDioDataSource(),
-          ),
-        )..fetchData(
-            authorId: author.id,
-          ),
+        create: (context) {
+          return getIt()
+            ..fetchData(
+              authorId: author.id,
+            );
+        },
         child: Column(
           children: [
             Padding(
@@ -100,7 +99,10 @@ class _ArticleItemWidget extends StatelessWidget {
         vertical: 10,
       ),
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => DetailsPage(model: model)));
+        },
         child: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: 20,
